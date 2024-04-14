@@ -1,0 +1,5 @@
+llama-index==0.10.28
+llama-index-llms-cohere
+llama-index-embeddings-cohere
+llama-index-postprocessor-cohere-rerank
+cohere==5.2.5
