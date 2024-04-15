@@ -4,6 +4,7 @@ from llama_index.core import (
     VectorStoreIndex,
     PromptTemplate,
 )
+from llama_index.core.node_parser import SentenceSplitter
 from llama_index.llms.cohere import Cohere
 from llama_index.postprocessor.cohere_rerank import CohereRerank
 from llama_index.embeddings.cohere import CohereEmbedding
@@ -14,7 +15,10 @@ COHERE_API_KEY = "<your-cohere-api-key>"
 llm = Cohere(api_key=COHERE_API_KEY)
 
 # Postprocessor
-cohere_rerank = CohereRerank(api_key=COHERE_API_KEY)
+cohere_rerank = CohereRerank(
+    api_key=COHERE_API_KEY,
+    top_n=4,
+)
 
 # Load the documents
 input_dir_path = "./data"
@@ -36,12 +40,14 @@ embed_model = CohereEmbedding(
 
 # Indexing and storing
 Settings.embed_model = embed_model
+Settings.text_splitter = SentenceSplitter(chunk_size=512, chunk_overlap=20)
+
 index = VectorStoreIndex.from_documents(docs)
 
 # Query engine
 Settings.llm = llm
 query_engine = index.as_query_engine(
-    similarity_top_k=10, node_postprocessors=[cohere_rerank]
+    similarity_top_k=16, node_postprocessors=[cohere_rerank]
 )
 
 # Prompt template
